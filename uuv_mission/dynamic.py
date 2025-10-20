@@ -74,9 +74,17 @@ class Mission:
         return cls(reference, cave_height, cave_depth)
 
     @classmethod
-    def from_csv(cls, file_name: str):
-        # You are required to implement this method
-        pass
+    def from_csv(cls, file_name="../mission.csv"):
+        import pandas as pd
+        data = pd.read_csv(file_name)
+        return cls(
+            reference=data["reference"].values,
+            cave_height=data["cave_height"].values,
+            cave_depth=data["cave_depth"].values
+        )
+
+
+    
 
 
 class ClosedLoop:
