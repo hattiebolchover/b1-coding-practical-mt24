@@ -2,6 +2,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+class Submarine:
+    def __init__(self, initial_depth=0.0):
+        # Initial submarine depth (m)
+        self.depth = initial_depth
+        # Vertical velocity (m/s)
+        self.velocity = 0.0
+        # Time step (s)
+        self.dt = 0.1  
+        print(f"Submarine initialized at depth {self.depth} m.")
+
+    def transition(self, control_input, disturbance=0.0):
+        """
+        Update the submarine state using a simple physics model.
+
+        control_input: thrust command (positive = up, negative = down)
+        disturbance: external disturbance (e.g., underwater current)
+        """
+        # Parameters
+        mass = 50.0  # kg
+        damping = 10.0  # drag coefficient
+
+        # Simple vertical motion model: F = ma
+        acceleration = (control_input - damping * self.velocity + disturbance) / mass
+        self.velocity += acceleration * self.dt
+        self.depth += self.velocity * self.dt
+
+    def get_depth(self):
+        """Return current submarine depth."""
+        return self.depth
+
+
+
 def generate_random_multisine_timeseries(length=100):
 
     t = np.linspace(0, 2 * np.pi, length)

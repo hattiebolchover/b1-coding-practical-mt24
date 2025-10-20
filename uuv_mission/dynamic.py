@@ -50,17 +50,25 @@ class Trajectory:
     def plot_completed_mission(self, mission: Mission):
         x_values = np.arange(len(mission.reference))
         min_depth = np.min(mission.cave_depth)
-        max_height = np.max(mission.cave_height)
+        max_depth = np.max(mission.cave_height)
 
-        plt.fill_between(x_values, mission.cave_height, mission.cave_depth, color='blue', alpha=0.3)
-        plt.fill_between(x_values, mission.cave_depth, min_depth*np.ones(len(x_values)), 
-                         color='saddlebrown', alpha=0.3)
-        plt.fill_between(x_values, max_height*np.ones(len(x_values)), mission.cave_height, 
-                         color='saddlebrown', alpha=0.3)
-        plt.plot(self.position[:, 0], self.position[:, 1], label='Trajectory')
+        plt.fill_between(x_values, mission.cave_depth, min_depth * np.ones(len(x_values)),
+                        color='saddlebrown', alpha=0.3)
+        plt.fill_between(x_values, max_depth * np.ones(len(x_values)), mission.cave_height,
+                        color='saddlebrown', alpha=0.3)
+
+        # ✅ Plot trajectory (depth vs step index)
+        plt.plot(np.arange(len(self.position)), self.position, label='Trajectory')
+
+        # ✅ Plot reference line
         plt.plot(mission.reference, 'r', linestyle='--', label='Reference')
+
         plt.legend(loc='upper right')
+        plt.xlabel("Step")
+        plt.ylabel("Depth")
+        plt.title("Completed Mission Trajectory")
         plt.show()
+
 
 @dataclass
 class Mission:
@@ -74,7 +82,7 @@ class Mission:
         return cls(reference, cave_height, cave_depth)
 
     @classmethod
-    def from_csv(cls, file_name="../mission.csv"):
+    def from_csv(cls, file_name):
         import pandas as pd
         data = pd.read_csv(file_name)
         return cls(
@@ -128,11 +136,28 @@ class ClosedLoop:
         # Return results
         return {"positions": positions, "actions": actions}
 
+    def simulate_with_random_disturbances(self, mission: Mission, variance=0.1):
+        """
+        Simulate the closed-loop system with random Gaussian disturbances.
+        """
+        import numpy as np
+
+        # Generate random disturbances (same length as the mission)
+        disturbances = np.random.normal(0, variance, len(mission.reference))
+
+        # Run the standard simulation
+        result = self.simulate(mission, disturbances)
+
+        # Return a Trajectory object for plotting
+        return Trajectory(result["positions"])
 
 
 
 
         
-    def simulate_with_random_disturbances(self, mission: Mission, variance: float = 0.5) -> Trajectory:
-        disturbances = np.random.normal(0, variance, len(mission.reference))
-        return self.simulate(mission, disturbances)
+def simulate_with_random_disturbances(self, mission: Mission, variance: float = 0.1):
+    disturbances = np.random.normal(0, variance, len(mission.reference))
+    result = self.simulate(mission, disturbances)
+    return Trajectory(result["positions"], result["actions"])
+
+
